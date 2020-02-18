@@ -15,7 +15,6 @@ export default {
   name: "CanvasGame",
   firebase() {
     return {
-      currentCube: this.cubesRef.child(this.cubeKey),
       otherCube: this.cubesRef.child(this.otherCubeKey)
     };
   },
@@ -31,13 +30,35 @@ export default {
       canvasObj: {
         width: 650,
         height: 450
+      },
+      currentCube: {
+        x: 20,
+        y: 20,
+        width: 20,
+        height: 20,
+        ySpeed: 0,
+        gravity: 0.5,
+        xSpeed: 0,
+        friction: 0.4,
+        acceleration: 0.3,
+        jumpForce: 8,
+        xBounce: false,
+        yBounce: false,
+        alreadyJumped: false,
+        online: false,
+        movement: {
+          left: false,
+          right: false,
+          jump: false
+        }
       }
     };
   },
   props: {
     cubeKey: String,
     otherCubeKey: String,
-    cubesRef: Object
+    cubesRef: Object,
+    currentCubeInit: Object
   },
 
   /////////////////////////////////////////////
@@ -210,17 +231,14 @@ export default {
           console.log(code); //Everything else
       }
     },
-    createCube(cubeId) {
-      this.cubeGravity(cubeId);
-      this.cube1Movement(cubeId);
+    createCube() {
+      this.cubeGravity();
+      this.cube1Movement();
       this.rectangle(this.currentCube);
     },
     setCube() {
-      const updates = {
-        [this.cubeKey]: this.currentCube
-      };
-
-      this.cubesRef.update(updates);
+      const { x, y } = this.currentCube;
+      this.currentCubeRef.update({ x, y });
     }
   },
 
@@ -231,6 +249,9 @@ export default {
     this.currentCubeRef.onDisconnect().update({ online: false });
     window.addEventListener("keydown", this.keyDown, false);
     window.addEventListener("keyup", this.keyUp, false);
+    this.currentCube.x = this.currentCubeInit.x;
+    this.currentCube.y = this.currentCubeInit.y;
+    this.currentCube.color = this.currentCubeInit.color;
     this.canvas = this.$refs.canvas;
     this.ctx = this.canvas.getContext("2d");
     let count = 0;
@@ -240,7 +261,11 @@ export default {
       this.drawCanvas(this.canvasObj);
       this.createCube(this.cubeKey);
       if (this.otherCube) {
-        this.rectangle(this.otherCube);
+        this.rectangle({
+          ...this.otherCube,
+          width: this.currentCube.width,
+          height: this.currentCube.height
+        });
       }
       this.rectangle(this.floor);
 
