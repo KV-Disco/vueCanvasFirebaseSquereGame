@@ -256,10 +256,9 @@ export default {
     this.ctx = this.canvas.getContext("2d");
     let count = 0;
 
-    setInterval(() => {
+    const nuevaFotograma = () => {
       count += 1;
       this.drawCanvas(this.canvasObj);
-      this.createCube(this.cubeKey);
       if (this.otherCube) {
         this.rectangle({
           ...this.otherCube,
@@ -267,13 +266,37 @@ export default {
           height: this.currentCube.height
         });
       }
+      this.createCube(this.cubeKey);
       this.rectangle(this.floor);
 
       if (count == 1) {
         count = 0;
         this.setCube();
       }
-    }, this.fps);
+
+      window.requestAnimationFrame(nuevaFotograma);
+    };
+
+    window.requestAnimationFrame(nuevaFotograma);
+
+    // setInterval(() => {
+    //   count += 1;
+    //   this.drawCanvas(this.canvasObj);
+    //   this.createCube(this.cubeKey);
+    //   if (this.otherCube) {
+    //     this.rectangle({
+    //       ...this.otherCube,
+    //       width: this.currentCube.width,
+    //       height: this.currentCube.height
+    //     });
+    //   }
+    //   this.rectangle(this.floor);
+
+    //   if (count == 1) {
+    //     count = 0;
+    //     this.setCube();
+    //   }
+    // }, this.fps);
   },
   beforeDestroy() {
     this.currentCubeRef.update({ online: false });
