@@ -15,17 +15,9 @@ export default {
   name: "CanvasGame",
   firebase() {
     return {
-      cubes: this.cubesRef,
-      currentCube: this.cubesRef.child(this.cubeKey)
+      currentCube: this.cubesRef.child(this.cubeKey),
+      otherCube: this.cubesRef.child(this.otherCubeKey)
     };
-  },
-  watch: {
-    documentId(id) {
-      // $rtdbBind automatically unbinds the previously bound property
-      // `currentDocument` will be bound as an object because it's value
-      // is not an array
-      this.$rtdbBind("currentCube", this.cubesRef.child(id));
-    }
   },
 
   /////////////////////////////////////////////
@@ -35,6 +27,7 @@ export default {
     return {
       canvas: null,
       ctx: null,
+      currentCubeRef: this.cubesRef.child(this.cubeKey),
       canvasObj: {
         width: 650,
         height: 450
@@ -43,6 +36,7 @@ export default {
   },
   props: {
     cubeKey: String,
+    otherCubeKey: String,
     cubesRef: Object
   },
 
@@ -51,7 +45,7 @@ export default {
   /////////////////////////////////////////////
   computed: {
     fps() {
-      return 1000 / 10;
+      return 1000 / 60;
     },
     floor() {
       return {
@@ -223,11 +217,10 @@ export default {
     },
     setCube() {
       const updates = {
-        ["/cubes/" + this.cubeKey]: this.currentCube
+        [this.cubeKey]: this.currentCube
       };
 
       this.cubesRef.update(updates);
-      // this.$emit("updateCube", this.currentCube);
     }
   },
 
@@ -235,17 +228,30 @@ export default {
   ////               MOUNTED               ////
   /////////////////////////////////////////////
   mounted() {
+    this.currentCubeRef.onDisconnect().update({ online: false });
     window.addEventListener("keydown", this.keyDown, false);
     window.addEventListener("keyup", this.keyUp, false);
     this.canvas = this.$refs.canvas;
     this.ctx = this.canvas.getContext("2d");
+    let count = 0;
 
     setInterval(() => {
+      count += 1;
       this.drawCanvas(this.canvasObj);
       this.createCube(this.cubeKey);
+      if (this.otherCube) {
+        this.rectangle(this.otherCube);
+      }
       this.rectangle(this.floor);
-      this.setCube();
+
+      if (count == 1) {
+        count = 0;
+        this.setCube();
+      }
     }, this.fps);
+  },
+  beforeDestroy() {
+    this.currentCubeRef.update({ online: false });
   }
 };
 </script>
