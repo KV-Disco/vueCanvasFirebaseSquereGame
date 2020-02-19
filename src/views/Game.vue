@@ -14,7 +14,7 @@
 <script>
 // @ is an alias to /src
 import Firebase from "firebase";
-import config from "@/fireBaseConfig";
+import config from "@/firebaseConfig";
 import CanvasGame from "@/components/CanvasGame/CanvasGame.vue";
 
 let app = Firebase.initializeApp(config);
