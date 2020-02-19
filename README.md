@@ -26,6 +26,12 @@ export default {
 };
 ```
 
+### Compiles and hot-reloads for development
+
+```
+yarn serve
+```
+
 The first time you start the app your firebase database is probably empty, don't worry the file Game.vue checks if the database has the necessary information, if not it creates the 2 necessaries docs.
 
 The database will probably end looking like this:
@@ -47,12 +53,6 @@ The database will probably end looking like this:
     }
   }
 }
-```
-
-### Compiles and hot-reloads for development
-
-```
-yarn serve
 ```
 
 ### Compiles and minifies for production
