@@ -33,45 +33,51 @@ export default {
   components: {
     CanvasGame
   },
-  mounted() {
-    cubesRef.once("value", snap => {
-      const docs = snap.val();
-      const keys = Object.keys(docs);
+  methods: {
+    poluteDataBase() {
+      const newCube = {
+        online: false,
+        x: 20,
+        y: 20
+      };
+      let nextStep = false;
+      const restart = nextStep => {
+        if (nextStep) {
+          this.start();
+        }
+      };
 
+      this.cubesRef.push({ ...newCube, color: "blue" }).then(() => {
+        restart(nextStep);
+        nextStep = true;
+      });
+      this.cubesRef.push({ ...newCube, color: "red" }).then(() => {
+        restart(nextStep);
+        nextStep = true;
+      });
+    },
+    selecCube(docs) {
+      const keys = Object.keys(docs);
       this.cubeKey = keys.find(key => docs[key].online == false);
       if (this.cubeKey) {
         this.currentCubeInit = docs[this.cubeKey];
         cubesRef.child(this.cubeKey).update({ online: true });
       }
       this.otherCubeKey = keys.find(key => key !== this.cubeKey);
-    });
+    },
+    start() {
+      cubesRef.once("value", snap => {
+        const docs = snap.val();
+        if (!docs) {
+          this.poluteDataBase();
+        } else {
+          this.selecCube(docs);
+        }
+      });
+    }
+  },
+  mounted() {
+    this.start();
   }
 };
-
-//this.cubesRef
-//  .push({
-//    color: "red",
-//    x: 20,
-//    y: 20,
-//    width: 20,
-//    height: 20,
-//    ySpeed: 0,
-//    gravity: 0.5,
-//    xSpeed: 0,
-//    friction: 0.4,
-//    acceleration: 0.3,
-//    jumpForce: 8,
-//    xBounce: false,
-//    yBounce: false,
-//    alreadyJumped: false,
-//    online: false,
-//    movement: {
-//      left: false,
-//      right: false,
-//      jump: false
-//    }
-//  })
-//  .then(cube => {
-//    this.cubeKey = cube.key;
-//  });
 </script>
