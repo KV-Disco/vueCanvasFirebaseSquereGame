@@ -2,6 +2,8 @@
 
 In this small project, I'm testing the plausibility of using firebase to make a small multiplayer 2d game.
 
+For now is liited to 2 users at the same time.
+
 ## Project setup
 
 ```
